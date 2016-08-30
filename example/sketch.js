@@ -28,3 +28,16 @@ function draw() {
   var text = select('#tweet_text');
   text.html(message);
 }
+
+var configProfile = {
+  "profile": {"screenName": 'starbucks'},
+  "domId": 'tweetExamples',
+  "maxTweets": 5,
+  "enableLinks": false,
+  "showUser": false,
+  "showTime": false,
+  "showImages": true,
+  "showInteraction": false,
+  "lang": 'en'
+};
+twitterFetcher.fetch(configProfile);

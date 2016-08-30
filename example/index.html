@@ -6,11 +6,27 @@
     <script language="javascript" type="text/javascript" src="focusedRandom.js"></script>
     <script language="javascript" type="text/javascript" src=".purview_helper.js"></script>
 
+    <script language="javascript" type="text/javascript" src="twitterFetcher.js"></script>
+
+
 <!-- Add bot list here. -->
     <script language="javascript" type="text/javascript" src="dribnet_bot.js"></script>
 
     <script language="javascript" type="text/javascript" src="sketch.js"></script>
-    <style> body {padding: 0; margin: 0;} </style>
+    <style>
+    body {padding: 0; margin: 0;}
+    ul li {
+      list-style:none;
+      overflow:hidden;
+      border:1px solid #dedede;
+      margin:5px;
+      padding:5px;
+	}
+    .media img {
+      max-width:440px;
+      max-height:220px;
+    }
+    </style>
 </head>
 
 <body style="background-color:white">
@@ -19,5 +35,7 @@
         <p id="tweet_text">
         </p>
     </pre>
+    <hr>
+    <div id="tweetExamples"></div>
 
 </body>
