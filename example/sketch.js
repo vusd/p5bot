@@ -1,7 +1,9 @@
 var rndSeed;
 
 function setup () {
-  createCanvas(440, 220);
+  var main_canvas = createCanvas(440, 220);
+  main_canvas.parent('canvasContainer');
+
   rndSeed = random(1024);
 }
 
@@ -19,7 +21,8 @@ function draw() {
   // randomSeed(0);
   resetFocusedRandom(rndSeed);
   var num_owls = 0;
-  for (var i = 35; i < width - 40; i += 40) {
+  var spacing = focusedRandom(20, 60, 4);
+  for (var i = 35; i < width - 40; i += spacing) {
     var gray = int(focusedRandom(0, 102, 3))
     var scalar = focusedRandom(0.15, 0.75, 2);
     // var gray = int(random(0, 102));
@@ -27,6 +30,8 @@ function draw() {
     owl(i, 160, gray, scalar);
     num_owls = num_owls + 1;
   }
+  var text = select('#tweet_text');
+  text.html("Here are " + num_owls + " owls.")
 }
 
 function owl(x, y, g, s) {

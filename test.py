@@ -9,4 +9,7 @@ img = driver.get_screenshot_as_png()
 img = Image.open(BytesIO(img))
 cropped = img.crop((0,0,440,220))
 cropped.save('image.png')
+
+elem = driver.find_element_by_css_selector('#tweet_text')
+print(elem.get_attribute('innerHTML'))
 # driver.save_screenshot('screen.png') # save a screenshot to disk
