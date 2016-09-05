@@ -10,15 +10,22 @@ from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 from PIL import Image
 from io import BytesIO
 
 def run_tweet_code():
-    driver = webdriver.PhantomJS() # or add to your PATH
+    params = '--web-security=no'
+    driver = webdriver.PhantomJS(service_args=[params])
     driver.set_window_size(440, 220) # optional
     driver.get('example/index.html')
     wait = WebDriverWait(driver, 10)
-    wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#render_ready")))
+    try:
+        wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#render_ready")))
+    except TimeoutException:
+        print("Timeout waiting for page load")
+        print(driver.get_log("browser"))
+        sys.exit(1)
     img = driver.get_screenshot_as_png()
     img = Image.open(BytesIO(img))
     cropped = img.crop((0,0,440,220))

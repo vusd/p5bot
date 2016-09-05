@@ -3,12 +3,16 @@ var rndSeed;
 var bot;
 var renderReady = false;
 
+function preload() {
+  bot = new bot();
+  bot.preload();
+}
+
 function setup () {
   var main_canvas = createCanvas(440, 220);
   main_canvas.parent('canvasContainer');
 
   rndSeed = random(1024);
-  bot = new dribnet_bot();
   bot.setup();
 }
 
@@ -34,24 +38,9 @@ function draw() {
   var text = select('#tweet_text');
   text.html(message);
   if(renderReady == false) {
-    reportRenderReady();
-    renderReady = true;
+    if(bot.isDone()) {
+      reportRenderReady();
+      renderReady = true;
+    }
   }
 }
-
-if (typeof debug_interface !== 'undefined') {
-  // Your variable is undefined
-  var configProfile = {
-    "profile": {"screenName": 'starbucks'},
-    "domId": 'tweetExamples',
-    "maxTweets": 5,
-    "enableLinks": false,
-    "showUser": false,
-    "showTime": false,
-    "showImages": true,
-    "showInteraction": false,
-    "lang": 'en'
-  };
-  twitterFetcher.fetch(configProfile);
-}
-
