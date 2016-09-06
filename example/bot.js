@@ -1,7 +1,9 @@
 function bot() {
   this.url = 'https://query.yahooapis.com/v1/public/yql?q=select%20item.forecast%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22wellington%2Cnz%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys'
+  this.image_url = 'http://www.greylynnweather.net/jpgwebcam.jpg'
   this.weatherData;
   this.temperatures = [];
+  this.have_drawn = false;
 
   this.owl = function(x, y, g, s) {
     push();
@@ -22,11 +24,17 @@ function bot() {
     pop();
   }
 
+  this.isDone = function() {
+    return this.have_drawn;
+  }
+
   this.preload = function() {
     this.weatherData = loadJSON(this.url);
   }
 
   this.setup = function() {
+    this.img = createImg(this.image_url);
+
     var results = this.weatherData["query"]["results"]["channel"];
     for(var i=0;i<results.length;i++) {
       var forecast = results[i]["item"]["forecast"]
@@ -35,20 +43,16 @@ function bot() {
       ]
       this.temperatures.push(pair)
     }
-    /*
-    for(i=0;i<10;i++) {
-      this.temperatures.push([40, 40]);
-    }
-    */
 
-    console.log(this.temperatures);
-  }
-
-  this.isDone = function() {
-    return true;
+    println(this.temperatures);
   }
 
   this.respond = function() {
+    if(this.img.width <= 0) {
+      text("loading", 100, 100);
+      return "loading";
+    }
+    image(this.img, 0, 0, 440, 220);
     var num_owls = Math.floor(focusedRandom(5, 11, 3, 7));
     var spacing = 400 / num_owls;
     for (i=0; i<num_owls; i++) {
@@ -57,6 +61,7 @@ function bot() {
       var scalar = focusedRandom(0.15, 0.75, 2);
       this.owl(xpos, 220-2*this.temperatures[i][1], gray, scalar);
     }
+    this.have_drawn = true;
     var message = "" + num_owls + " day weather owl forecast.";
     return message;
   }
