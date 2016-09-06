@@ -95,3 +95,6 @@ if __name__ == "__main__":
     else:
         archive_subdir = time.strftime("%Y%m%d_%H%M%S")
     archive_post(archive_subdir, post_image='temp/image.png', post_text=status)
+
+    print(u"Posted: {}".format(status))
+
