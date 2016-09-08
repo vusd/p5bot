@@ -9,7 +9,14 @@ function preload() {
 }
 
 function setup () {
-  var main_canvas = createCanvas(440, 220);
+  var main_canvas;
+    
+  if (bot.preferredRenderer != null) {
+      main_canvas = createCanvas(440, 220, bot.preferredRenderer());
+  } else {
+      main_canvas = createCanvas(440, 220);
+  }
+
   main_canvas.parent('canvasContainer');
 
   rndSeed = random(1024);
