@@ -25,6 +25,11 @@ function bot() {
     // return true if your bot is done responding
     // otherwise, return false to get more time
   }
+
+  //Optionally:
+  this.preferredRenderer = function() {
+      return P2D; // Either P2D or WEBGL;
+  }
 }
 
 ```
