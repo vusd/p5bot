@@ -47,12 +47,12 @@ def archive_post(subdir, post_image, post_text, archive_dir="archives"):
     # save input, a few working files, outputs
     copyfile(post_image, archive_final_image_path)
 
-def run_tweet_code(source_html):
+def run_tweet_code(source_html, timeout):
     params = '--web-security=no'
     driver = webdriver.PhantomJS(service_args=[params])
     driver.set_window_size(440, 220) # optional
     driver.get(source_html)
-    wait = WebDriverWait(driver, 20)
+    wait = WebDriverWait(driver, timeout)
     try:
         wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#render_ready")))
     except TimeoutException:
@@ -68,7 +68,7 @@ def run_tweet_code(source_html):
     return elem.get_attribute('innerHTML')
 
 last_index_file = "temp/last_index.txt"
-def run_swaplist(swaplist):
+def run_swaplist(swaplist, sourcedir):
     try:
         with open(last_index_file) as f:
             content = f.readlines()
@@ -85,8 +85,13 @@ def run_swaplist(swaplist):
     command = "cd {} && git pull".format(record["subdir"])
     os.system(command)
 
-    command = "cp {}/bot.* current/.".format(record["subdir"])
+    command = "cp {}/* {}/.".format(record["subdir"], sourcedir)
     os.system(command)
+
+    os.system("cp example/index.html {}/.".format(sourcedir))
+    os.system("cp example/sketch.js {}/.".format(sourcedir))
+    os.system("cp example/focusedRandom.js {}/.".format(sourcedir))
+    os.system("cp example/.purview_helper.js {}/.".format(sourcedir))
 
     if os.path.isfile(last_index_file):
         copyfile(last_index_file, "{}.bak".format(last_index_file))
@@ -97,7 +102,7 @@ def run_swaplist(swaplist):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Post beeps to timeline')
     parser.add_argument('-d','--debug', help='Debug: do not post', default=False, action='store_true')
-    parser.add_argument('-s', '--source', dest='source', default='example/index.html',
+    parser.add_argument('-s', '--sourcedir', dest='sourcedir', default='example',
                         help="Source html to run")
     parser.add_argument('-c','--creds', dest='creds', default='creds.json',
                         help='Twitter json credentials.')
@@ -105,16 +110,19 @@ if __name__ == "__main__":
                         help='Run swap settings json list')
     parser.add_argument("--archive-subdir", dest='archive_subdir', default=None,
                         help="specific subdirectory for archiving results")
+    parser.add_argument('-t', "--timeout", dest='timeout', type=int, default=20,
+                        help="timeout for running tweet")
     args = parser.parse_args()
 
     swaplist_name = None
     if args.swaplist is not None:
         with open(args.swaplist) as data_file:
             swaplist = json.load(data_file)
-            swaplist_name = run_swaplist(swaplist)
+            swaplist_name = run_swaplist(swaplist, args.sourcedir)
             print("Swapped in bot from {}".format(swaplist_name))
 
-    tweet_status = run_tweet_code(args.source)
+    source_url = "{}/index.html".format(args.sourcedir)
+    tweet_status = run_tweet_code(source_url, args.timeout)
     if tweet_status is None:
         status = "(timeout)"
     else:
