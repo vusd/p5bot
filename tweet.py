@@ -58,7 +58,7 @@ def run_tweet_code(source_html):
     except TimeoutException:
         print("Timeout waiting for page load")
         print(driver.get_log("browser"))
-        sys.exit(1)
+        return None
     img = driver.get_screenshot_as_png()
     img = Image.open(BytesIO(img))
     cropped = img.crop((0,0,440,220))
@@ -114,7 +114,11 @@ if __name__ == "__main__":
             swaplist_name = run_swaplist(swaplist)
             print("Swapped in bot from {}".format(swaplist_name))
 
-    status = run_tweet_code(args.source)
+    tweet_status = run_tweet_code(args.source)
+    if tweet_status is None:
+        status = "(timeout)"
+    else:
+        status = tweet_status
     if swaplist_name is not None:
         status = "{} ({})".format(status, swaplist_name)
 
@@ -130,7 +134,11 @@ if __name__ == "__main__":
 
     api = tweepy.API(auth)
 
-    api.update_with_media(filename='temp/image.png', status=status)
+    if tweet_status is None:
+        # Error, no image
+        api.update_status(status=status)
+    else:
+        api.update_with_media(filename='temp/image.png', status=status)
 
     if args.archive_subdir:
         archive_subdir = args.archive_subdir
