@@ -82,6 +82,9 @@ def run_swaplist(swaplist):
         cur_index = 0
     record = swaplist[cur_index]
 
+    command = "cd {} && git pull".format(record["subdir"])
+    os.system(command)
+
     command = "cp {}/bot.* current/.".format(record["subdir"])
     os.system(command)
 

@@ -10,5 +10,5 @@ PATH=$PATH:/usr/local/bin
 echo "--> RUNNING "`date` >> run_log.txt
 
 /usr/bin/unbuffer /usr/local/anaconda2/envs/p5bot/bin/python \
-    tweet.py \
+	tweet.py -s current/index.html --swaplist choice.json \
     >> run_log.txt 2>&1
