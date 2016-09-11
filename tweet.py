@@ -67,6 +67,30 @@ def run_tweet_code(source_html):
     elem = driver.find_element_by_css_selector('#tweet_text')
     return elem.get_attribute('innerHTML')
 
+last_index_file = "temp/last_index.txt"
+def run_swaplist(swaplist):
+    try:
+        with open(last_index_file) as f:
+            content = f.readlines()
+            last_index = int(content[0])
+    except EnvironmentError: # parent of IOError, OSError
+        # that's ok
+        print("No record of last index ({}), will create".format(last_index_file))
+        last_index = -1
+    cur_index = last_index + 1
+    if cur_index >= len(swaplist):
+        cur_index = 0
+    record = swaplist[cur_index]
+
+    command = "cp {}/bot.* current/.".format(record["subdir"])
+    os.system(command)
+
+    if os.path.isfile(last_index_file):
+        copyfile(last_index_file, "{}.bak".format(last_index_file))
+    with open(last_index_file, "w") as f:
+        f.write("{}\n".format(cur_index))
+    return record["name"]
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Post beeps to timeline')
     parser.add_argument('-d','--debug', help='Debug: do not post', default=False, action='store_true')
@@ -74,11 +98,22 @@ if __name__ == "__main__":
                         help="Source html to run")
     parser.add_argument('-c','--creds', dest='creds', default='creds.json',
                         help='Twitter json credentials.')
+    parser.add_argument('--swaplist', dest='swaplist', default=None,
+                        help='Run swap settings json list')
     parser.add_argument("--archive-subdir", dest='archive_subdir', default=None,
                         help="specific subdirectory for archiving results")
     args = parser.parse_args()
 
+    swaplist_name = None
+    if args.swaplist is not None:
+        with open(args.swaplist) as data_file:
+            swaplist = json.load(data_file)
+            swaplist_name = run_swaplist(swaplist)
+            print("Swapped in bot from {}".format(swaplist_name))
+
     status = run_tweet_code(args.source)
+    if swaplist_name is not None:
+        status = "{} ({})".format(status, swaplist_name)
 
     if args.debug:
         print("Status is: {}".format(status))
