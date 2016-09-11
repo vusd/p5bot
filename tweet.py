@@ -47,12 +47,12 @@ def archive_post(subdir, post_image, post_text, archive_dir="archives"):
     # save input, a few working files, outputs
     copyfile(post_image, archive_final_image_path)
 
-def run_tweet_code():
+def run_tweet_code(source_html):
     params = '--web-security=no'
     driver = webdriver.PhantomJS(service_args=[params])
     driver.set_window_size(440, 220) # optional
-    driver.get('example/index.html')
-    wait = WebDriverWait(driver, 10)
+    driver.get(source_html)
+    wait = WebDriverWait(driver, 20)
     try:
         wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#render_ready")))
     except TimeoutException:
@@ -70,17 +70,21 @@ def run_tweet_code():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Post beeps to timeline')
     parser.add_argument('-d','--debug', help='Debug: do not post', default=False, action='store_true')
+    parser.add_argument('-s', '--source', dest='source', default='example/index.html',
+                        help="Source html to run")
+    parser.add_argument('-c','--creds', dest='creds', default='creds.json',
+                        help='Twitter json credentials.')
     parser.add_argument("--archive-subdir", dest='archive_subdir', default=None,
                         help="specific subdirectory for archiving results")
     args = parser.parse_args()
 
-    status = run_tweet_code()
+    status = run_tweet_code(args.source)
 
     if args.debug:
         print("Status is: {}".format(status))
         sys.exit(0)
 
-    with open('creds.json') as data_file:
+    with open(args.creds) as data_file:
         creds = json.load(data_file)
 
     auth = tweepy.OAuthHandler(creds["consumer_key"], creds["consumer_secret"])
