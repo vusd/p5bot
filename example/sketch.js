@@ -5,7 +5,9 @@ var renderReady = false;
 
 function preload() {
   bot = new bot();
-  bot.preload();
+  if (bot.preload != null) {
+    bot.preload();
+  }
 }
 
 function setup () {
@@ -20,7 +22,9 @@ function setup () {
   main_canvas.parent('canvasContainer');
 
   rndSeed = random(1024);
-  bot.setup();
+  if (bot.setup != null) {
+    bot.setup();
+  }
 }
 
 function keyTyped() {
@@ -45,7 +49,7 @@ function draw() {
   var text = select('#tweet_text');
   text.html(message);
   if(renderReady == false) {
-    if(bot.isDone()) {
+    if(bot.isDone == null || bot.isDone()) {
       reportRenderReady();
       renderReady = true;
     }
