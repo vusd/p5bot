@@ -150,9 +150,9 @@ if __name__ == "__main__":
             api.update_with_media(filename='temp/image.png', status=status)
     except tweepy.error.TweepError as e:
         now_string = time.strftime("%Y%m%d_%H%M%S")
-        new_status = "{} [{}]".format(e["message"], now_string)
+        new_status = "{} [{}]".format(e, now_string)
         if swaplist_name is not None:
-            new_status = "{} ({}) [now_string]".format(new_status, swaplist_name)
+            new_status = "{} ({})".format(new_status, swaplist_name)
         api.update_status(status=new_status)
 
     if args.archive_subdir:
