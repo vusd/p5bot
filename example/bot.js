@@ -47,6 +47,13 @@ function bot() {
     println(this.temperatures);
   }
 
+  this.grammar = {
+    "animal": ["bird","animal","creature","owl","night-watcher"],
+    "reaction": ["vexing","perplexing","exciting","wistful","enigmatic"],
+    "prediction": ["prediction", "forecast", "prognostication"],
+    "timeunit": ["day", "night"]
+  }
+
   this.respond = function() {
     if(this.img.width <= 0) {
       text("loading", 100, 100);
@@ -62,7 +69,10 @@ function bot() {
       this.owl(xpos, 220-2*this.temperatures[i][1], gray, scalar);
     }
     this.have_drawn = true;
-    var message = "" + num_owls + " day weather owl forecast.";
+    // construct the message
+    var grammar = tracery.createGrammar(this.grammar);
+    var seed = "" + num_owls + " #timeunit# #reaction# #animal.s# #prediction#";
+    var message = grammar.flatten(seed);
     return message;
   }
 }
