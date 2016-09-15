@@ -67,9 +67,10 @@ def run_tweet_code(source_html, timeout):
     elem = driver.find_element_by_css_selector('#tweet_text')
     return elem.get_attribute('innerHTML')
 
-last_index_file = "temp/last_index.txt"
-def run_swaplist(swaplist, sourcedir):
+last_index_template = "temp/last_index_{}.txt"
+def run_swaplist(swapname, swaplist, sourcedir):
     try:
+        last_index_file = last_index_template.format(swapname)
         with open(last_index_file) as f:
             content = f.readlines()
             last_index = int(content[0])
@@ -118,7 +119,7 @@ if __name__ == "__main__":
     if args.swaplist is not None:
         with open(args.swaplist) as data_file:
             swaplist = json.load(data_file)
-            swaplist_name = run_swaplist(swaplist, args.sourcedir)
+            swaplist_name = run_swaplist(args.swaplist, swaplist, args.sourcedir)
             print("Swapped in bot from {}".format(swaplist_name))
 
     source_url = "{}/index.html".format(args.sourcedir)
