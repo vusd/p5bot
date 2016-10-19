@@ -8,6 +8,7 @@ import sys
 from shutil import copyfile
 import time
 import os
+import signal
 
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
@@ -47,6 +48,11 @@ def archive_post(subdir, post_image, post_text, archive_dir="archives"):
     # save input, a few working files, outputs
     copyfile(post_image, archive_final_image_path)
 
+# http://stackoverflow.com/questions/25110624/how-to-properly-stop-phantomjs-execution
+def stopDriver(driver):
+    driver.service.process.send_signal(signal.SIGTERM)
+    driver.quit()
+
 def run_tweet_code(source_html, timeout):
     params = '--web-security=no'
     driver = webdriver.PhantomJS(service_args=[params])
@@ -58,14 +64,17 @@ def run_tweet_code(source_html, timeout):
     except TimeoutException:
         print("Timeout waiting for page load")
         print(driver.get_log("browser"))
-        return None
+        stopDriver(driver)
+        exit(1)
     img = driver.get_screenshot_as_png()
     img = Image.open(BytesIO(img))
     cropped = img.crop((0,0,440,220))
     cropped.save('temp/image.png')
 
     elem = driver.find_element_by_css_selector('#tweet_text')
-    return elem.get_attribute('innerHTML')
+    text = elem.get_attribute('innerHTML')
+    stopDriver(driver)
+    return text
 
 last_index_template = "temp/last_index_{}.txt"
 def run_swaplist(swapname, swaplist, sourcedir):
@@ -113,6 +122,7 @@ if __name__ == "__main__":
                         help="specific subdirectory for archiving results")
     parser.add_argument('-t', "--timeout", dest='timeout', type=int, default=20,
                         help="timeout for running tweet")
+    parser.add_argument('--noname', help='Do not append name', default=False, action='store_true')
     args = parser.parse_args()
 
     swaplist_name = None
@@ -128,8 +138,13 @@ if __name__ == "__main__":
         status = "(timeout)"
     else:
         status = tweet_status
-    if swaplist_name is not None:
+    if swaplist_name is not None and not args.noname:
         status = "{} ({})".format(status, swaplist_name)
+
+    max_tweet_length = 140
+    if len(status) > max_tweet_length:
+        print("Warning: status being trimmed from {} chars".format(len(status)))
+        status = "{}...".format(tweet_status[:(max_tweet_length-3)])
 
     if args.debug:
         print("Status is: {}".format(status))
