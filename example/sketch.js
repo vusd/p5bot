@@ -37,11 +37,14 @@ function keyTyped() {
 }
 
 function reportRenderReady() {
-  finalDiv = createDiv('(render ready)');  
+  finalDiv = createDiv('(done drawing)');
   finalDiv.id("render_ready")
 }
 
 function draw() {
+  if(renderReady) {
+    return;
+  }
   background(204);
   // randomSeed(0);
   resetFocusedRandom(rndSeed);
@@ -49,9 +52,11 @@ function draw() {
   var text = select('#tweet_text');
   text.html(message);
   if(renderReady == false) {
-    if(bot.isDone == null || bot.isDone()) {
+    if(bot.isDone()) {
       reportRenderReady();
       renderReady = true;
+      // turn off animation
+      noLoop();
     }
   }
 }
