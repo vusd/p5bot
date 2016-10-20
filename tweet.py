@@ -98,7 +98,7 @@ def run_swaplist(swapname, swaplist, sourcedir):
     command = "cp {}/* {}/.".format(record["subdir"], sourcedir)
     os.system(command)
 
-    os.system("cp example/index.html {}/.".format(sourcedir))
+    # os.system("cp example/index.html {}/.".format(sourcedir))
     os.system("cp example/sketch.js {}/.".format(sourcedir))
     os.system("cp example/focusedRandom.js {}/.".format(sourcedir))
     os.system("cp example/.purview_helper.js {}/.".format(sourcedir))
