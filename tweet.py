@@ -95,6 +95,10 @@ def run_swaplist(swapname, swaplist, sourcedir):
     command = "cd {} && git pull".format(record["subdir"])
     os.system(command)
 
+    # make output directory if it is not there
+    if not os.path.exists(sourcedir):
+        os.makedirs(sourcedir)
+
     command = "cp {}/* {}/.".format(record["subdir"], sourcedir)
     os.system(command)
 
